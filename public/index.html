@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Happy Monthsary ❤️</title>
+  <title>Happy Monthsary, Mahal! ❤️</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -434,29 +434,49 @@
     document.getElementById('openFormBtn').addEventListener('click', () => formModal.classList.add('active'));
     document.getElementById('closeFormBtn').addEventListener('click', () => formModal.classList.remove('active'));
 
-    document.getElementById('submitNoteBtn').addEventListener('click', async () => {
-      const author = document.getElementById('authorInput').value;
-      const text = document.getElementById('messageInput').value;
+   document.getElementById('submitNoteBtn').addEventListener('click', async () => {
+  const author = document.getElementById('authorInput').value;
+  const text = document.getElementById('messageInput').value;
 
-      if (!text.trim()) return alert("Please enter a note!");
+  if (!text.trim()) return alert("Please enter a note!");
 
-      try {
-        const res = await fetch('/api/data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ author, text })
-        });
-        const result = await res.json();
-        appData.messages.push(result.message);
-        
-        document.getElementById('messageInput').value = '';
-        formModal.classList.remove('active');
-        createFirework(window.innerWidth / 2, window.innerHeight / 2);
-        alert("Love note submitted to the server! ❤️");
-      } catch (err) {
-        alert("Failed to submit.");
-      }
+  // 👉 PASTE YOUR DISCORD WEBHOOK URL HERE
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1544144774079062066/SWU7-SXUcFwXUpDmms-Z5uYZMHbPqj3nH-8mzbErHDz_32W8og6Z4Yw_Mt8UyIHka9Vr";
+
+  const payload = {
+    username: "Monthsary Bot 💕",
+    avatar_url: "https://cdn-icons-png.flaticon.com/512/833/833472.png",
+    embeds: [{
+      title: "💌 New Love Note Received!",
+      color: 16731501, // Pink
+      fields: [
+        { name: "👤 From:", value: `**${author.trim() || 'My Sweetheart'}**`, inline: true },
+        { name: "💬 Message:", value: text.trim(), inline: false }
+      ],
+      footer: { text: "Happy Monthsary ✨" },
+      timestamp: new Date().toISOString()
+    }]
+  };
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
+
+    if (res.ok) {
+      document.getElementById('messageInput').value = '';
+      formModal.classList.remove('active');
+      createFirework(window.innerWidth / 2, window.innerHeight / 2);
+      alert("Love note sent to Discord! ❤️");
+    } else {
+      alert("Discord rejected the webhook. Please double check the URL!");
+    }
+  } catch (err) {
+    alert("Failed to send to Discord.");
+  }
+});
   </script>
 </body>
 </html>
