@@ -1,10 +1,12 @@
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "https://discord.com/api/webhooks/1544144774079062066/SWU7-SXUcFwXUpDmms-Z5uYZMHbPqj3nH-8mzbErHDz_32W8og6Z4Yw_Mt8UyIHka9Vr";
+
 // Pre-configured relationship details
 const defaultData = {
   config: {
     partnerOne: "My Love",
     partnerTwo: "Sweetheart",
     startDate: "2024-06-01:00:00.000Z", // Change this to your start date
-    mainLetter: "Thank you for bringing so much happiness, comfort, and laughter into my life. Every day with you is magic. Happy Monthsary! ❤️"
+    mainLetter: "Thank you for bringing so much happiness, comfort, and laughter into my life. Kahit lagi mo akong inaaway tsaka tinutusok yung tagiliran. Happy Monthsary! ❤️"
   },
   messages: [
     { id: 1, author: "Love", text: "I fall in love with you more and more every single day. 💕" },
