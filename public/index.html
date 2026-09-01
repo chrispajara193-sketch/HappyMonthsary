@@ -13,8 +13,8 @@
     :root {
       --primary: #ff4d6d;
       --secondary: #ff758f;
-      --accent-glow: rgba(255, 77, 109, 0.45);
-      --bg: #08080c;
+      --accent-glow: rgba(255, 77, 109, 0.6);
+      --bg: #060609;
     }
 
     * {
@@ -56,7 +56,7 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 24px;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 25px var(--accent-glow);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 25px var(--accent-glow);
       animation: float 4s ease-in-out infinite;
     }
 
@@ -80,9 +80,9 @@
 
     h1 {
       font-family: 'Dancing Script', cursive;
-      font-size: 3.2rem;
+      font-size: 3.4rem;
       color: #fff;
-      text-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
+      text-shadow: 0 0 15px var(--primary), 0 0 35px var(--primary);
       margin-bottom: 10px;
       line-height: 1.2;
     }
@@ -97,10 +97,10 @@
     .counter-box {
       display: flex;
       justify-content: space-around;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.55);
       padding: 15px;
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       margin-bottom: 25px;
     }
 
@@ -108,6 +108,7 @@
       font-size: 1.8rem;
       color: var(--secondary);
       font-weight: 600;
+      text-shadow: 0 0 10px var(--accent-glow);
     }
 
     .counter-item p {
@@ -119,7 +120,7 @@
 
     .hint-text {
       font-size: 0.85rem;
-      color: #8f8f9d;
+      color: #b0b0c5;
       margin-bottom: 20px;
       font-style: italic;
     }
@@ -145,12 +146,12 @@
     .btn-primary {
       background: linear-gradient(45deg, var(--primary), #ff8fa3);
       color: #fff;
-      box-shadow: 0 4px 20px rgba(255, 77, 109, 0.4);
+      box-shadow: 0 4px 20px rgba(255, 77, 109, 0.5);
     }
 
     .btn-primary:hover {
       transform: scale(1.05);
-      box-shadow: 0 6px 25px rgba(255, 77, 109, 0.7);
+      box-shadow: 0 6px 25px rgba(255, 77, 109, 0.8);
     }
 
     .btn-secondary {
@@ -168,8 +169,8 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
       z-index: 100;
       display: flex;
       align-items: center;
@@ -194,7 +195,7 @@
       text-align: center;
       transform: scale(0.85);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 0 30px var(--accent-glow);
+      box-shadow: 0 0 35px var(--accent-glow);
     }
 
     .modal-overlay.active .modal-card {
@@ -203,7 +204,7 @@
 
     .modal-card h2 {
       font-family: 'Dancing Script', cursive;
-      font-size: 2.2rem;
+      font-size: 2.3rem;
       color: var(--secondary);
       margin-bottom: 12px;
     }
@@ -248,7 +249,7 @@
   <canvas id="fireworks-canvas"></canvas>
 
   <div class="container">
-    <div class="badge" id="coupleBadge">Celebrating Us</div>
+    <div class="badge" id="coupleBadge">Celebrating Us 🐾</div>
     <h1 id="headline">Happy Monthsary!</h1>
     <p class="subtitle" id="subtitle">Every second with you is magic.</p>
 
@@ -268,7 +269,7 @@
       </div>
     </div>
 
-    <p class="hint-text">✨ Tap anywhere on the screen for fireworks ✨</p>
+    <p class="hint-text">✨ Tap anywhere for colorful cat fireworks 🐱✨</p>
 
     <div class="btn-group">
       <button class="btn btn-primary" id="openMessageBtn">Read Love Letter 💌</button>
@@ -304,7 +305,9 @@
   </div>
 
   <script>
-    // Fireworks Engine
+    /* ==========================================================
+       1. VIBRANT & BRIGHT CAT-SHAPED FIREWORKS ENGINE 🐱✨
+       ========================================================== */
     const canvas = document.getElementById('fireworks-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -316,85 +319,194 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    const romanticColors = ['#ff4d6d', '#ff758f', '#ffb3c1', '#c77dff', '#e0aaff', '#ffd166', '#ffffff'];
+    // Vibrant Neon Palette
+    const vibrantColors = [
+      '#ff007f', '#ff3366', '#ff70a6', // Hot Pinks
+      '#00f0ff', '#00d2ff', '#70d6ff', // Electric Cyan
+      '#b5179e', '#7209b7', '#f72585', // Neon Purples & Magentas
+      '#ffd166', '#ffb703', '#ffea00', // Radiant Yellow / Gold
+      '#39ff14', '#06d6a0',             // Neon Mint / Lime
+      '#ffffff'                         // Sparkling Diamond White
+    ];
 
-    class Particle {
-      constructor(x, y, color) {
+    class CatParticle {
+      constructor(x, y, dx, dy, color, sizeMultiplier = 1) {
         this.x = x;
         this.y = y;
+        const speed = Math.random() * 0.4 + 2.2;
+        this.vx = dx * speed;
+        this.vy = dy * speed;
         this.color = color;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 5 + 1;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
-        this.size = Math.random() * 3 + 1.5;
-        this.gravity = 0.04;
+        this.decay = Math.random() * 0.012 + 0.010;
+        this.size = (Math.random() * 2 + 2) * sizeMultiplier;
+        this.gravity = 0.018;
       }
+
       update() {
+        this.vx *= 0.985;
+        this.vy *= 0.985;
+        this.vy += this.gravity;
         this.x += this.vx;
         this.y += this.vy;
-        this.vy += this.gravity;
         this.alpha -= this.decay;
       }
+
       draw(ctx) {
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.alpha);
+        
+        // Inner bright spark
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 18;
         ctx.shadowColor = this.color;
         ctx.fill();
+
+        // Extra white-hot glowing center
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 0.45, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
         ctx.restore();
       }
     }
 
-    function createFirework(x, y) {
-      const particleCount = 35;
-      const color = romanticColors[Math.floor(Math.random() * romanticColors.length)];
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle(x, y, color));
+    // Mathematical blueprint of a cute Cat Face 🐱
+    function getCatVectors() {
+      const vectors = [];
+
+      // 1. Lower Face & Chin Round curve (180° to 360°)
+      for (let angle = 0.1; angle < Math.PI * 0.95; angle += 0.15) {
+        vectors.push({ x: Math.cos(angle) * 1.1, y: Math.sin(angle) * 0.95 + 0.1 });
+      }
+
+      // 2. Left Cheek & Ear
+      vectors.push({ x: -1.0, y: 0.1 });
+      vectors.push({ x: -1.05, y: -0.2 });
+      vectors.push({ x: -1.1, y: -0.5 });
+      vectors.push({ x: -1.0, y: -0.9 }); // Left Ear Tip Peak
+      vectors.push({ x: -0.7, y: -0.7 });
+      vectors.push({ x: -0.45, y: -0.55 });
+
+      // 3. Head top between ears
+      vectors.push({ x: -0.2, y: -0.58 });
+      vectors.push({ x: 0.0, y: -0.6 });
+      vectors.push({ x: 0.2, y: -0.58 });
+
+      // 4. Right Ear & Cheek
+      vectors.push({ x: 0.45, y: -0.55 });
+      vectors.push({ x: 0.7, y: -0.7 });
+      vectors.push({ x: 1.0, y: -0.9 }); // Right Ear Tip Peak
+      vectors.push({ x: 1.1, y: -0.5 });
+      vectors.push({ x: 1.05, y: -0.2 });
+      vectors.push({ x: 1.0, y: 0.1 });
+
+      // 5. Cat Eyes (Left & Right)
+      vectors.push({ x: -0.4, y: -0.05, eye: true });
+      vectors.push({ x: -0.4, y: -0.15, eye: true });
+      vectors.push({ x: 0.4, y: -0.05, eye: true });
+      vectors.push({ x: 0.4, y: -0.15, eye: true });
+
+      // 6. Cute Nose
+      vectors.push({ x: 0.0, y: 0.18, eye: true });
+
+      // 7. Whiskers (Left & Right radiating lines)
+      // Left whiskers
+      vectors.push({ x: -0.7, y: 0.15 });
+      vectors.push({ x: -1.3, y: 0.1 });
+      vectors.push({ x: -0.7, y: 0.3 });
+      vectors.push({ x: -1.3, y: 0.45 });
+      // Right whiskers
+      vectors.push({ x: 0.7, y: 0.15 });
+      vectors.push({ x: 1.3, y: 0.1 });
+      vectors.push({ x: 0.7, y: 0.3 });
+      vectors.push({ x: 1.3, y: 0.45 });
+
+      return vectors;
+    }
+
+    function createCatFirework(originX, originY) {
+      const catPoints = getCatVectors();
+      const baseColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+      const accentColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+
+      catPoints.forEach(pt => {
+        // Add random scatter for shimmering effect
+        const jitterX = (Math.random() - 0.5) * 0.08;
+        const jitterY = (Math.random() - 0.5) * 0.08;
+        const color = pt.eye ? '#ffffff' : (Math.random() > 0.3 ? baseColor : accentColor);
+        const sizeMult = pt.eye ? 1.4 : 1.1;
+
+        particles.push(new CatParticle(originX, originY, pt.x + jitterX, pt.y + jitterY, color, sizeMult));
+      });
+
+      // Extra glittering sparkles in the center
+      for (let i = 0; i < 20; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 0.5;
+        particles.push(new CatParticle(originX, originY, Math.cos(angle) * dist, Math.sin(angle) * dist, '#ffffff', 0.8));
       }
     }
 
     function animate() {
-      ctx.fillStyle = 'rgba(8, 8, 12, 0.2)';
+      // Semi-transparent fade creates ultra smooth trailing glow
+      ctx.fillStyle = 'rgba(6, 6, 9, 0.22)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 'lighter' blend mode makes overlapping sparks intensely bright neon
+      ctx.globalCompositeOperation = 'lighter';
+
       particles = particles.filter(p => p.alpha > 0);
-      particles.forEach(p => { p.update(); p.draw(ctx); });
+      particles.forEach(p => {
+        p.update();
+        p.draw(ctx);
+      });
+
+      ctx.globalCompositeOperation = 'source-over';
       requestAnimationFrame(animate);
     }
     animate();
 
+    // Trigger cat fireworks on click / tap anywhere
     window.addEventListener('pointerdown', (e) => {
       if (!['BUTTON', 'INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-        createFirework(e.clientX, e.clientY);
+        createCatFirework(e.clientX, e.clientY);
       }
     });
 
-    // Backend Integration
+    /* ==========================================================
+       2. BACKEND INTEGRATION & DATA
+       ========================================================== */
     let appData = { config: {}, messages: [] };
-    let startDate = new Date();
+    let startDate = new Date(2023, 0, 1);
 
     async function loadData() {
       try {
         const res = await fetch('/api/data');
-        appData = await res.json();
-        
-        document.getElementById('coupleBadge').innerText = `${appData.config.partnerOne} & ${appData.config.partnerTwo}`;
-        startDate = new Date(appData.config.startDate);
-        
-        // Initial fireworks
-        createFirework(window.innerWidth * 0.5, window.innerHeight * 0.3);
+        if (res.ok) {
+          appData = await res.json();
+          if (appData.config) {
+            document.getElementById('coupleBadge').innerText = `${appData.config.partnerOne} & ${appData.config.partnerTwo} 🐾`;
+            if (appData.config.startDate) startDate = new Date(appData.config.startDate);
+          }
+        }
       } catch (err) {
-        console.error("Backend fetch error:", err);
+        console.log("Using default configuration");
       }
+      // Initial celebratory cat bursts
+      setTimeout(() => {
+        createCatFirework(window.innerWidth * 0.35, window.innerHeight * 0.3);
+        createCatFirework(window.innerWidth * 0.65, window.innerHeight * 0.3);
+      }, 500);
     }
     loadData();
 
-    // Timer
+    /* ==========================================================
+       3. LIVE RELATIONSHIP COUNTER
+       ========================================================== */
     function updateCounter() {
       const now = new Date();
       const diffTime = Math.abs(now - startDate);
@@ -408,75 +520,83 @@
       document.getElementById('minutes-count').innerText = isNaN(minutes) ? 0 : minutes;
     }
     setInterval(updateCounter, 1000);
+    updateCounter();
 
-    // Modal Events
+    /* ==========================================================
+       4. MODALS & DISCORD WEBHOOK INTEGRATION
+       ========================================================== */
     const modal = document.getElementById('modalOverlay');
     const formModal = document.getElementById('formModalOverlay');
 
     document.getElementById('openMessageBtn').addEventListener('click', () => {
-      document.getElementById('modalTitle').innerText = `To My Love ❤️`;
-      document.getElementById('modalBody').innerText = appData.config.mainLetter || "Happy Monthsary!";
+      document.getElementById('modalTitle').innerText = `To My Favorite Person ❤️`;
+      document.getElementById('modalBody').innerText = appData.config?.mainLetter || "Thank you for all the laughter, sweet hugs, and beautiful memories. Happy Monthsary, Mahal! 🌸";
       modal.classList.add('active');
-      createFirework(window.innerWidth / 2, window.innerHeight / 2);
+      createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
     });
 
+    const sweetNotes = [
+      "I fall in love with you more and more every single day. 💕",
+      "You are my favorite place to go when my mind searches for peace. 🌸",
+      "Thank you for being my rock, my best friend, and my greatest love. ✨",
+      "Loving you is the easiest and best thing I've ever done. 🐱❤️"
+    ];
+
     document.getElementById('randomQuoteBtn').addEventListener('click', () => {
-      if (appData.messages && appData.messages.length > 0) {
-        const randomMsg = appData.messages[Math.floor(Math.random() * appData.messages.length)];
-        document.getElementById('modalTitle').innerText = `Note from ${randomMsg.author} 💌`;
-        document.getElementById('modalBody').innerText = `"${randomMsg.text}"`;
-      }
+      const randomMsg = sweetNotes[Math.floor(Math.random() * sweetNotes.length)];
+      document.getElementById('modalTitle').innerText = `Sweet Reminder 💌`;
+      document.getElementById('modalBody').innerText = randomMsg;
       modal.classList.add('active');
-      createFirework(window.innerWidth / 2, window.innerHeight / 2);
+      createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
     });
 
     document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.remove('active'));
     document.getElementById('openFormBtn').addEventListener('click', () => formModal.classList.add('active'));
     document.getElementById('closeFormBtn').addEventListener('click', () => formModal.classList.remove('active'));
 
-   document.getElementById('submitNoteBtn').addEventListener('click', async () => {
-  const author = document.getElementById('authorInput').value;
-  const text = document.getElementById('messageInput').value;
+    document.getElementById('submitNoteBtn').addEventListener('click', async () => {
+      const author = document.getElementById('authorInput').value;
+      const text = document.getElementById('messageInput').value;
 
-  if (!text.trim()) return alert("Please enter a note!");
+      if (!text.trim()) return alert("Please enter a note!");
 
-  // 👉 PASTE YOUR DISCORD WEBHOOK URL HERE
-  const WEBHOOK_URL = "https://discord.com/api/webhooks/1544144774079062066/SWU7-SXUcFwXUpDmms-Z5uYZMHbPqj3nH-8mzbErHDz_32W8og6Z4Yw_Mt8UyIHka9Vr";
+      // Discord Webhook
+      const WEBHOOK_URL = "https://discord.com/api/webhooks/1544144774079062066/SWU7-SXUcFwXUpDmms-Z5uYZMHbPqj3nH-8mzbErHDz_32W8og6Z4Yw_Mt8UyIHka9Vr";
 
-  const payload = {
-    username: "Monthsary Bot 💕",
-    avatar_url: "https://cdn-icons-png.flaticon.com/512/833/833472.png",
-    embeds: [{
-      title: "💌 New Love Note Received!",
-      color: 16731501, // Pink
-      fields: [
-        { name: "👤 From:", value: `**${author.trim() || 'My Sweetheart'}**`, inline: true },
-        { name: "💬 Message:", value: text.trim(), inline: false }
-      ],
-      footer: { text: "Happy Monthsary ✨" },
-      timestamp: new Date().toISOString()
-    }]
-  };
+      const payload = {
+        username: "Monthsary Bot 💕",
+        avatar_url: "https://cdn-icons-png.flaticon.com/512/833/833472.png",
+        embeds: [{
+          title: "💌 New Love Note Received!",
+          color: 16731501,
+          fields: [
+            { name: "👤 From:", value: `**${author.trim() || 'My Sweetheart'}**`, inline: true },
+            { name: "💬 Message:", value: text.trim(), inline: false }
+          ],
+          footer: { text: "Happy Monthsary ✨" },
+          timestamp: new Date().toISOString()
+        }]
+      };
 
-  try {
-    const res = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          document.getElementById('messageInput').value = '';
+          formModal.classList.remove('active');
+          createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
+          alert("Love note sent to Discord! ❤️");
+        } else {
+          alert("Discord rejected the webhook. Please check the URL.");
+        }
+      } catch (err) {
+        alert("Failed to send to Discord.");
+      }
     });
-
-    if (res.ok) {
-      document.getElementById('messageInput').value = '';
-      formModal.classList.remove('active');
-      createFirework(window.innerWidth / 2, window.innerHeight / 2);
-      alert("Love note sent to Discord! ❤️");
-    } else {
-      alert("Discord rejected the webhook. Please double check the URL!");
-    }
-  } catch (err) {
-    alert("Failed to send to Discord.");
-  }
-});
   </script>
 </body>
 </html>
