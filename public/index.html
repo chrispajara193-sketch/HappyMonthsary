@@ -269,7 +269,7 @@
       </div>
     </div>
 
-    <p class="hint-text">✨ Tap anywhere for colorful cat fireworks 🐱✨</p>
+    <p class="hint-text">✨ Tap anywhere for colorful paw fireworks 🐾✨</p>
 
     <div class="btn-group">
       <button class="btn btn-primary" id="openMessageBtn">Read Love Letter 💌</button>
@@ -306,12 +306,12 @@
 
   <script>
     /* ==========================================================
-       1. ULTRA-FAST & LAG-FREE CAT FIREWORKS ENGINE 🚀🐱
+       1. PAW-SHAPED FIREWORKS ENGINE 🐾 (Fast & Lag-Free)
        ========================================================== */
     const canvas = document.getElementById('fireworks-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    const MAX_PARTICLES = 250; // Prevents browser lag on spam click
+    const MAX_PARTICLES = 250;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -325,46 +325,50 @@
       '#b5179e', '#f72585', '#ffd166', '#39ff14', '#ffffff'
     ];
 
-    // Pre-calculated static cat vectors (calculated once, saving huge CPU time)
-    const CAT_VECTORS = (() => {
+    // Pre-calculated geometric vectors for a Paw Print 🐾
+    const PAW_VECTORS = (() => {
       const pts = [];
-      for (let angle = 0.1; angle < Math.PI * 0.95; angle += 0.22) {
-        pts.push({ x: Math.cos(angle) * 1.1, y: Math.sin(angle) * 0.95 + 0.1 });
+
+      // 1. Large Main Center Pad (Heart / Rounded Bean)
+      for (let a = 0; a < Math.PI * 2; a += 0.28) {
+        pts.push({ x: Math.cos(a) * 0.55, y: Math.sin(a) * 0.42 + 0.25 });
       }
-      // Ears & Head
-      pts.push(
-        { x: -1.0, y: 0.0 }, { x: -1.05, y: -0.3 }, { x: -0.95, y: -0.85 }, // Left Ear
-        { x: -0.65, y: -0.65 }, { x: -0.3, y: -0.55 }, { x: 0, y: -0.58 }, // Top
-        { x: 0.3, y: -0.55 }, { x: 0.65, y: -0.65 }, { x: 0.95, y: -0.85 }, // Right Ear
-        { x: 1.05, y: -0.3 }, { x: 1.0, y: 0.0 },
-        // Eyes
-        { x: -0.38, y: -0.1, eye: true }, { x: 0.38, y: -0.1, eye: true },
-        // Whiskers
-        { x: -0.7, y: 0.15 }, { x: -1.25, y: 0.05 },
-        { x: -0.7, y: 0.32 }, { x: -1.25, y: 0.45 },
-        { x: 0.7, y: 0.15 }, { x: 1.25, y: 0.05 },
-        { x: 0.7, y: 0.32 }, { x: 1.25, y: 0.45 }
-      );
+      // Inner fill for main pad
+      pts.push({ x: 0, y: 0.25 }, { x: -0.2, y: 0.25 }, { x: 0.2, y: 0.25 });
+
+      // Helper to generate the 4 Toe Pads
+      function makeToe(cx, cy, rx, ry) {
+        for (let a = 0; a < Math.PI * 2; a += 0.5) {
+          pts.push({ x: cx + Math.cos(a) * rx, y: cy + Math.sin(a) * ry, toe: true });
+        }
+        pts.push({ x: cx, y: cy, toe: true }); // toe center spark
+      }
+
+      makeToe(-0.62, -0.15, 0.18, 0.24); // Outer Left Toe
+      makeToe(-0.25, -0.52, 0.20, 0.26); // Inner Left Toe
+      makeToe(0.25, -0.52, 0.20, 0.26);  // Inner Right Toe
+      makeToe(0.62, -0.15, 0.18, 0.24);  // Outer Right Toe
+
       return pts;
     })();
 
-    class CatParticle {
+    class PawParticle {
       constructor(x, y, dx, dy, color, size) {
         this.x = x;
         this.y = y;
-        const speed = 2.4;
+        const speed = 2.3;
         this.vx = dx * speed;
         this.vy = dy * speed;
         this.color = color;
         this.alpha = 1;
-        this.decay = Math.random() * 0.015 + 0.015;
+        this.decay = Math.random() * 0.015 + 0.013;
         this.size = size;
       }
 
       update() {
         this.vx *= 0.97;
         this.vy *= 0.97;
-        this.vy += 0.02; // soft gravity
+        this.vy += 0.018; // slight gravity
         this.x += this.vx;
         this.y += this.vy;
         this.alpha -= this.decay;
@@ -374,33 +378,32 @@
         ctx.globalAlpha = this.alpha > 0 ? this.alpha : 0;
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, 6.283); // 2 * PI = 6.283
+        ctx.arc(this.x, this.y, this.size, 0, 6.283); // 2 * PI
         ctx.fill();
       }
     }
 
-    function createCatFirework(originX, originY) {
+    function createPawFirework(originX, originY) {
       if (particles.length > MAX_PARTICLES) {
-        particles.splice(0, 40); // drop older particles to keep 60 FPS
+        particles.splice(0, 35); // prevent lag on spam clicking
       }
 
-      const baseColor = vibrantColors[Math.floor(Math.random() * (vibrantColors.length - 1))];
-      
-      for (let i = 0; i < CAT_VECTORS.length; i++) {
-        const pt = CAT_VECTORS[i];
-        const color = pt.eye ? '#ffffff' : baseColor;
-        const size = pt.eye ? 3.5 : 2.5;
-        particles.push(new CatParticle(originX, originY, pt.x, pt.y, color, size));
+      const mainColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+      const toeColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+
+      for (let i = 0; i < PAW_VECTORS.length; i++) {
+        const pt = PAW_VECTORS[i];
+        const color = pt.toe ? toeColor : mainColor;
+        const size = pt.toe ? 2.8 : 2.5;
+        particles.push(new PawParticle(originX, originY, pt.x, pt.y, color, size));
       }
     }
 
     function animate() {
-      // Fast background clear
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillStyle = 'rgba(6, 6, 9, 0.25)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Light-weight additive blending for bright glow without blur lag
       ctx.globalCompositeOperation = 'lighter';
 
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -419,7 +422,7 @@
 
     window.addEventListener('pointerdown', (e) => {
       if (!['BUTTON', 'INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-        createCatFirework(e.clientX, e.clientY);
+        createPawFirework(e.clientX, e.clientY);
       }
     });
 
@@ -442,7 +445,7 @@
         console.log("Offline mode active.");
       }
       setTimeout(() => {
-        createCatFirework(window.innerWidth * 0.5, window.innerHeight * 0.35);
+        createPawFirework(window.innerWidth * 0.5, window.innerHeight * 0.35);
       }, 400);
     }
     loadData();
@@ -468,21 +471,21 @@
       document.getElementById('modalTitle').innerText = `To My Favorite Person ❤️`;
       document.getElementById('modalBody').innerText = "Thank you for all the laughter, sweet hugs, and beautiful memories. Happy Monthsary, Mahal! 🌸";
       modal.classList.add('active');
-      createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
+      createPawFirework(window.innerWidth / 2, window.innerHeight / 2);
     });
 
     const sweetNotes = [
       "I fall in love with you more and more every single day. 💕",
       "You are my favorite place to go when my mind searches for peace. 🌸",
       "Thank you for being my rock, my best friend, and my greatest love. ✨",
-      "Loving you is the easiest and best thing I've ever done. 🐱❤️"
+      "Loving you is the easiest and best thing I've ever done. 🐾❤️"
     ];
 
     document.getElementById('randomQuoteBtn').addEventListener('click', () => {
       document.getElementById('modalTitle').innerText = `Sweet Reminder 💌`;
       document.getElementById('modalBody').innerText = sweetNotes[Math.floor(Math.random() * sweetNotes.length)];
       modal.classList.add('active');
-      createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
+      createPawFirework(window.innerWidth / 2, window.innerHeight / 2);
     });
 
     document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.remove('active'));
@@ -522,7 +525,7 @@
         if (res.ok) {
           document.getElementById('messageInput').value = '';
           formModal.classList.remove('active');
-          createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
+          createPawFirework(window.innerWidth / 2, window.innerHeight / 2);
           alert("Love note sent to Discord! ❤️");
         } else {
           alert("Discord rejected the webhook. Please check the URL.");
