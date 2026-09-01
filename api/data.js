@@ -3,7 +3,7 @@ const defaultData = {
   config: {
     partnerOne: "My Love",
     partnerTwo: "Sweetheart",
-    startDate: "2023-01-01T00:00:00.000Z", // Change this to your start date
+    startDate: "2024-06-01", // Change this to your start date
     mainLetter: "Thank you for bringing so much happiness, comfort, and laughter into my life. Every day with you is magic. Happy Monthsary! ❤️"
   },
   messages: [
