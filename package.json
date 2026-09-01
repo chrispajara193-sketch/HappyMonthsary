@@ -1,0 +1,10 @@
+{
+  "name": "monthsary-website",
+  "version": "1.0.0",
+  "description": "Monthsary website with fireworks and backend API",
+  "main": "api/data.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {}
+}

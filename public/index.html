@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Monthsary ❤️</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #ff4d6d;
+      --secondary: #ff758f;
+      --accent-glow: rgba(255, 77, 109, 0.45);
+      --bg: #08080c;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    #fireworks-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 650px;
+      width: 90%;
+      text-align: center;
+      padding: 40px 25px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 25px var(--accent-glow);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 18px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-radius: 50px;
+      background: rgba(255, 77, 109, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--secondary);
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3.2rem;
+      color: #fff;
+      text-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    p.subtitle {
+      font-size: 1rem;
+      color: #cfcfe0;
+      margin-bottom: 25px;
+      font-weight: 300;
+    }
+
+    .counter-box {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 25px;
+    }
+
+    .counter-item h3 {
+      font-size: 1.8rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .counter-item p {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a0a0b0;
+    }
+
+    .hint-text {
+      font-size: 0.85rem;
+      color: #8f8f9d;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      outline: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, var(--primary), #ff8fa3);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255, 77, 109, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(255, 77, 109, 0.7);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #11111a;
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 480px;
+      padding: 30px 25px;
+      text-align: center;
+      transform: scale(0.85);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-card h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      color: var(--secondary);
+      margin-bottom: 12px;
+    }
+
+    .modal-card p {
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-weight: 300;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: white;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .close-btn {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 8px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fireworks-canvas"></canvas>
+
+  <div class="container">
+    <div class="badge" id="coupleBadge">Celebrating Us</div>
+    <h1 id="headline">Happy Monthsary!</h1>
+    <p class="subtitle" id="subtitle">Every second with you is magic.</p>
+
+    <!-- Days Counter -->
+    <div class="counter-box">
+      <div class="counter-item">
+        <h3 id="days-count">0</h3>
+        <p>Days</p>
+      </div>
+      <div class="counter-item">
+        <h3 id="hours-count">0</h3>
+        <p>Hours</p>
+      </div>
+      <div class="counter-item">
+        <h3 id="minutes-count">0</h3>
+        <p>Minutes</p>
+      </div>
+    </div>
+
+    <p class="hint-text">✨ Tap anywhere on the screen for fireworks ✨</p>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" id="openMessageBtn">Read Love Letter 💌</button>
+      <button class="btn btn-secondary" id="randomQuoteBtn">Sweet Note 💖</button>
+      <button class="btn btn-secondary" id="openFormBtn">Leave a Note ✍️</button>
+    </div>
+  </div>
+
+  <!-- Popup Modal (Message Display) -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <h2 id="modalTitle">My Dearest Love ❤️</h2>
+      <p id="modalBody">Loading message...</p>
+      <button class="close-btn" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- Popup Modal (Leave a note) -->
+  <div class="modal-overlay" id="formModalOverlay">
+    <div class="modal-card">
+      <h2>Send a Sweet Note 💌</h2>
+      <div class="form-group">
+        <input type="text" id="authorInput" placeholder="Your Name or Nickname" />
+      </div>
+      <div class="form-group">
+        <textarea id="messageInput" rows="3" placeholder="Write your sweet message here..."></textarea>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn btn-primary" id="submitNoteBtn">Send</button>
+        <button class="close-btn" id="closeFormBtn" style="background: rgba(255,255,255,0.1);">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Fireworks Engine
+    const canvas = document.getElementById('fireworks-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const romanticColors = ['#ff4d6d', '#ff758f', '#ffb3c1', '#c77dff', '#e0aaff', '#ffd166', '#ffffff'];
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 1;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.015;
+        this.size = Math.random() * 3 + 1.5;
+        this.gravity = 0.04;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function createFirework(x, y) {
+      const particleCount = 35;
+      const color = romanticColors[Math.floor(Math.random() * romanticColors.length)];
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(8, 8, 12, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles = particles.filter(p => p.alpha > 0);
+      particles.forEach(p => { p.update(); p.draw(ctx); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    window.addEventListener('pointerdown', (e) => {
+      if (!['BUTTON', 'INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        createFirework(e.clientX, e.clientY);
+      }
+    });
+
+    // Backend Integration
+    let appData = { config: {}, messages: [] };
+    let startDate = new Date();
+
+    async function loadData() {
+      try {
+        const res = await fetch('/api/data');
+        appData = await res.json();
+        
+        document.getElementById('coupleBadge').innerText = `${appData.config.partnerOne} & ${appData.config.partnerTwo}`;
+        startDate = new Date(appData.config.startDate);
+        
+        // Initial fireworks
+        createFirework(window.innerWidth * 0.5, window.innerHeight * 0.3);
+      } catch (err) {
+        console.error("Backend fetch error:", err);
+      }
+    }
+    loadData();
+
+    // Timer
+    function updateCounter() {
+      const now = new Date();
+      const diffTime = Math.abs(now - startDate);
+
+      const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffTime / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diffTime / (1000 * 60)) % 60);
+
+      document.getElementById('days-count').innerText = isNaN(days) ? 0 : days;
+      document.getElementById('hours-count').innerText = isNaN(hours) ? 0 : hours;
+      document.getElementById('minutes-count').innerText = isNaN(minutes) ? 0 : minutes;
+    }
+    setInterval(updateCounter, 1000);
+
+    // Modal Events
+    const modal = document.getElementById('modalOverlay');
+    const formModal = document.getElementById('formModalOverlay');
+
+    document.getElementById('openMessageBtn').addEventListener('click', () => {
+      document.getElementById('modalTitle').innerText = `To My Love ❤️`;
+      document.getElementById('modalBody').innerText = appData.config.mainLetter || "Happy Monthsary!";
+      modal.classList.add('active');
+      createFirework(window.innerWidth / 2, window.innerHeight / 2);
+    });
+
+    document.getElementById('randomQuoteBtn').addEventListener('click', () => {
+      if (appData.messages && appData.messages.length > 0) {
+        const randomMsg = appData.messages[Math.floor(Math.random() * appData.messages.length)];
+        document.getElementById('modalTitle').innerText = `Note from ${randomMsg.author} 💌`;
+        document.getElementById('modalBody').innerText = `"${randomMsg.text}"`;
+      }
+      modal.classList.add('active');
+      createFirework(window.innerWidth / 2, window.innerHeight / 2);
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.remove('active'));
+    document.getElementById('openFormBtn').addEventListener('click', () => formModal.classList.add('active'));
+    document.getElementById('closeFormBtn').addEventListener('click', () => formModal.classList.remove('active'));
+
+    document.getElementById('submitNoteBtn').addEventListener('click', async () => {
+      const author = document.getElementById('authorInput').value;
+      const text = document.getElementById('messageInput').value;
+
+      if (!text.trim()) return alert("Please enter a note!");
+
+      try {
+        const res = await fetch('/api/data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ author, text })
+        });
+        const result = await res.json();
+        appData.messages.push(result.message);
+        
+        document.getElementById('messageInput').value = '';
+        formModal.classList.remove('active');
+        createFirework(window.innerWidth / 2, window.innerHeight / 2);
+        alert("Love note submitted to the server! ❤️");
+      } catch (err) {
+        alert("Failed to submit.");
+      }
+    });
+  </script>
+</body>
+</html>
