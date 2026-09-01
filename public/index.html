@@ -306,11 +306,12 @@
 
   <script>
     /* ==========================================================
-       1. VIBRANT & BRIGHT CAT-SHAPED FIREWORKS ENGINE 🐱✨
+       1. ULTRA-FAST & LAG-FREE CAT FIREWORKS ENGINE 🚀🐱
        ========================================================== */
     const canvas = document.getElementById('fireworks-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
+    const MAX_PARTICLES = 250; // Prevents browser lag on spam click
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -319,158 +320,103 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Vibrant Neon Palette
     const vibrantColors = [
-      '#ff007f', '#ff3366', '#ff70a6', // Hot Pinks
-      '#00f0ff', '#00d2ff', '#70d6ff', // Electric Cyan
-      '#b5179e', '#7209b7', '#f72585', // Neon Purples & Magentas
-      '#ffd166', '#ffb703', '#ffea00', // Radiant Yellow / Gold
-      '#39ff14', '#06d6a0',             // Neon Mint / Lime
-      '#ffffff'                         // Sparkling Diamond White
+      '#ff007f', '#ff3366', '#00f0ff', '#70d6ff', 
+      '#b5179e', '#f72585', '#ffd166', '#39ff14', '#ffffff'
     ];
 
+    // Pre-calculated static cat vectors (calculated once, saving huge CPU time)
+    const CAT_VECTORS = (() => {
+      const pts = [];
+      for (let angle = 0.1; angle < Math.PI * 0.95; angle += 0.22) {
+        pts.push({ x: Math.cos(angle) * 1.1, y: Math.sin(angle) * 0.95 + 0.1 });
+      }
+      // Ears & Head
+      pts.push(
+        { x: -1.0, y: 0.0 }, { x: -1.05, y: -0.3 }, { x: -0.95, y: -0.85 }, // Left Ear
+        { x: -0.65, y: -0.65 }, { x: -0.3, y: -0.55 }, { x: 0, y: -0.58 }, // Top
+        { x: 0.3, y: -0.55 }, { x: 0.65, y: -0.65 }, { x: 0.95, y: -0.85 }, // Right Ear
+        { x: 1.05, y: -0.3 }, { x: 1.0, y: 0.0 },
+        // Eyes
+        { x: -0.38, y: -0.1, eye: true }, { x: 0.38, y: -0.1, eye: true },
+        // Whiskers
+        { x: -0.7, y: 0.15 }, { x: -1.25, y: 0.05 },
+        { x: -0.7, y: 0.32 }, { x: -1.25, y: 0.45 },
+        { x: 0.7, y: 0.15 }, { x: 1.25, y: 0.05 },
+        { x: 0.7, y: 0.32 }, { x: 1.25, y: 0.45 }
+      );
+      return pts;
+    })();
+
     class CatParticle {
-      constructor(x, y, dx, dy, color, sizeMultiplier = 1) {
+      constructor(x, y, dx, dy, color, size) {
         this.x = x;
         this.y = y;
-        const speed = Math.random() * 0.4 + 2.2;
+        const speed = 2.4;
         this.vx = dx * speed;
         this.vy = dy * speed;
         this.color = color;
         this.alpha = 1;
-        this.decay = Math.random() * 0.012 + 0.010;
-        this.size = (Math.random() * 2 + 2) * sizeMultiplier;
-        this.gravity = 0.018;
+        this.decay = Math.random() * 0.015 + 0.015;
+        this.size = size;
       }
 
       update() {
-        this.vx *= 0.985;
-        this.vy *= 0.985;
-        this.vy += this.gravity;
+        this.vx *= 0.97;
+        this.vy *= 0.97;
+        this.vy += 0.02; // soft gravity
         this.x += this.vx;
         this.y += this.vy;
         this.alpha -= this.decay;
       }
 
-      draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.alpha);
-        
-        // Inner bright spark
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      draw() {
+        ctx.globalAlpha = this.alpha > 0 ? this.alpha : 0;
         ctx.fillStyle = this.color;
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = this.color;
-        ctx.fill();
-
-        // Extra white-hot glowing center
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.45, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        ctx.arc(this.x, this.y, this.size, 0, 6.283); // 2 * PI = 6.283
         ctx.fill();
-
-        ctx.restore();
       }
-    }
-
-    // Mathematical blueprint of a cute Cat Face 🐱
-    function getCatVectors() {
-      const vectors = [];
-
-      // 1. Lower Face & Chin Round curve (180° to 360°)
-      for (let angle = 0.1; angle < Math.PI * 0.95; angle += 0.15) {
-        vectors.push({ x: Math.cos(angle) * 1.1, y: Math.sin(angle) * 0.95 + 0.1 });
-      }
-
-      // 2. Left Cheek & Ear
-      vectors.push({ x: -1.0, y: 0.1 });
-      vectors.push({ x: -1.05, y: -0.2 });
-      vectors.push({ x: -1.1, y: -0.5 });
-      vectors.push({ x: -1.0, y: -0.9 }); // Left Ear Tip Peak
-      vectors.push({ x: -0.7, y: -0.7 });
-      vectors.push({ x: -0.45, y: -0.55 });
-
-      // 3. Head top between ears
-      vectors.push({ x: -0.2, y: -0.58 });
-      vectors.push({ x: 0.0, y: -0.6 });
-      vectors.push({ x: 0.2, y: -0.58 });
-
-      // 4. Right Ear & Cheek
-      vectors.push({ x: 0.45, y: -0.55 });
-      vectors.push({ x: 0.7, y: -0.7 });
-      vectors.push({ x: 1.0, y: -0.9 }); // Right Ear Tip Peak
-      vectors.push({ x: 1.1, y: -0.5 });
-      vectors.push({ x: 1.05, y: -0.2 });
-      vectors.push({ x: 1.0, y: 0.1 });
-
-      // 5. Cat Eyes (Left & Right)
-      vectors.push({ x: -0.4, y: -0.05, eye: true });
-      vectors.push({ x: -0.4, y: -0.15, eye: true });
-      vectors.push({ x: 0.4, y: -0.05, eye: true });
-      vectors.push({ x: 0.4, y: -0.15, eye: true });
-
-      // 6. Cute Nose
-      vectors.push({ x: 0.0, y: 0.18, eye: true });
-
-      // 7. Whiskers (Left & Right radiating lines)
-      // Left whiskers
-      vectors.push({ x: -0.7, y: 0.15 });
-      vectors.push({ x: -1.3, y: 0.1 });
-      vectors.push({ x: -0.7, y: 0.3 });
-      vectors.push({ x: -1.3, y: 0.45 });
-      // Right whiskers
-      vectors.push({ x: 0.7, y: 0.15 });
-      vectors.push({ x: 1.3, y: 0.1 });
-      vectors.push({ x: 0.7, y: 0.3 });
-      vectors.push({ x: 1.3, y: 0.45 });
-
-      return vectors;
     }
 
     function createCatFirework(originX, originY) {
-      const catPoints = getCatVectors();
-      const baseColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
-      const accentColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+      if (particles.length > MAX_PARTICLES) {
+        particles.splice(0, 40); // drop older particles to keep 60 FPS
+      }
 
-      catPoints.forEach(pt => {
-        // Add random scatter for shimmering effect
-        const jitterX = (Math.random() - 0.5) * 0.08;
-        const jitterY = (Math.random() - 0.5) * 0.08;
-        const color = pt.eye ? '#ffffff' : (Math.random() > 0.3 ? baseColor : accentColor);
-        const sizeMult = pt.eye ? 1.4 : 1.1;
-
-        particles.push(new CatParticle(originX, originY, pt.x + jitterX, pt.y + jitterY, color, sizeMult));
-      });
-
-      // Extra glittering sparkles in the center
-      for (let i = 0; i < 20; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * 0.5;
-        particles.push(new CatParticle(originX, originY, Math.cos(angle) * dist, Math.sin(angle) * dist, '#ffffff', 0.8));
+      const baseColor = vibrantColors[Math.floor(Math.random() * (vibrantColors.length - 1))];
+      
+      for (let i = 0; i < CAT_VECTORS.length; i++) {
+        const pt = CAT_VECTORS[i];
+        const color = pt.eye ? '#ffffff' : baseColor;
+        const size = pt.eye ? 3.5 : 2.5;
+        particles.push(new CatParticle(originX, originY, pt.x, pt.y, color, size));
       }
     }
 
     function animate() {
-      // Semi-transparent fade creates ultra smooth trailing glow
-      ctx.fillStyle = 'rgba(6, 6, 9, 0.22)';
+      // Fast background clear
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(6, 6, 9, 0.25)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 'lighter' blend mode makes overlapping sparks intensely bright neon
+      // Light-weight additive blending for bright glow without blur lag
       ctx.globalCompositeOperation = 'lighter';
 
-      particles = particles.filter(p => p.alpha > 0);
-      particles.forEach(p => {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
         p.update();
-        p.draw(ctx);
-      });
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        } else {
+          p.draw();
+        }
+      }
 
-      ctx.globalCompositeOperation = 'source-over';
       requestAnimationFrame(animate);
     }
     animate();
 
-    // Trigger cat fireworks on click / tap anywhere
     window.addEventListener('pointerdown', (e) => {
       if (!['BUTTON', 'INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
         createCatFirework(e.clientX, e.clientY);
@@ -478,59 +424,49 @@
     });
 
     /* ==========================================================
-       2. BACKEND INTEGRATION & DATA
+       2. DATA & LIVE COUNTER
        ========================================================== */
-    let appData = { config: {}, messages: [] };
     let startDate = new Date(2023, 0, 1);
 
     async function loadData() {
       try {
         const res = await fetch('/api/data');
         if (res.ok) {
-          appData = await res.json();
-          if (appData.config) {
-            document.getElementById('coupleBadge').innerText = `${appData.config.partnerOne} & ${appData.config.partnerTwo} 🐾`;
-            if (appData.config.startDate) startDate = new Date(appData.config.startDate);
+          const data = await res.json();
+          if (data.config) {
+            document.getElementById('coupleBadge').innerText = `${data.config.partnerOne} & ${data.config.partnerTwo} 🐾`;
+            if (data.config.startDate) startDate = new Date(data.config.startDate);
           }
         }
       } catch (err) {
-        console.log("Using default configuration");
+        console.log("Offline mode active.");
       }
-      // Initial celebratory cat bursts
       setTimeout(() => {
-        createCatFirework(window.innerWidth * 0.35, window.innerHeight * 0.3);
-        createCatFirework(window.innerWidth * 0.65, window.innerHeight * 0.3);
-      }, 500);
+        createCatFirework(window.innerWidth * 0.5, window.innerHeight * 0.35);
+      }, 400);
     }
     loadData();
 
-    /* ==========================================================
-       3. LIVE RELATIONSHIP COUNTER
-       ========================================================== */
     function updateCounter() {
       const now = new Date();
       const diffTime = Math.abs(now - startDate);
 
-      const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diffTime / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diffTime / (1000 * 60)) % 60);
-
-      document.getElementById('days-count').innerText = isNaN(days) ? 0 : days;
-      document.getElementById('hours-count').innerText = isNaN(hours) ? 0 : hours;
-      document.getElementById('minutes-count').innerText = isNaN(minutes) ? 0 : minutes;
+      document.getElementById('days-count').innerText = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById('hours-count').innerText = Math.floor((diffTime / (1000 * 60 * 60)) % 24);
+      document.getElementById('minutes-count').innerText = Math.floor((diffTime / (1000 * 60)) % 60);
     }
     setInterval(updateCounter, 1000);
     updateCounter();
 
     /* ==========================================================
-       4. MODALS & DISCORD WEBHOOK INTEGRATION
+       3. MODALS & DISCORD WEBHOOK
        ========================================================== */
     const modal = document.getElementById('modalOverlay');
     const formModal = document.getElementById('formModalOverlay');
 
     document.getElementById('openMessageBtn').addEventListener('click', () => {
       document.getElementById('modalTitle').innerText = `To My Favorite Person ❤️`;
-      document.getElementById('modalBody').innerText = appData.config?.mainLetter || "Thank you for all the laughter, sweet hugs, and beautiful memories. Happy Monthsary, Mahal! 🌸";
+      document.getElementById('modalBody').innerText = "Thank you for all the laughter, sweet hugs, and beautiful memories. Happy Monthsary, Mahal! 🌸";
       modal.classList.add('active');
       createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
     });
@@ -543,9 +479,8 @@
     ];
 
     document.getElementById('randomQuoteBtn').addEventListener('click', () => {
-      const randomMsg = sweetNotes[Math.floor(Math.random() * sweetNotes.length)];
       document.getElementById('modalTitle').innerText = `Sweet Reminder 💌`;
-      document.getElementById('modalBody').innerText = randomMsg;
+      document.getElementById('modalBody').innerText = sweetNotes[Math.floor(Math.random() * sweetNotes.length)];
       modal.classList.add('active');
       createCatFirework(window.innerWidth / 2, window.innerHeight / 2);
     });
@@ -560,7 +495,6 @@
 
       if (!text.trim()) return alert("Please enter a note!");
 
-      // Discord Webhook
       const WEBHOOK_URL = "https://discord.com/api/webhooks/1544144774079062066/SWU7-SXUcFwXUpDmms-Z5uYZMHbPqj3nH-8mzbErHDz_32W8og6Z4Yw_Mt8UyIHka9Vr";
 
       const payload = {
